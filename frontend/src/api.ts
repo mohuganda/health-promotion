@@ -218,3 +218,22 @@ export async function deleteSubArticle(token, id) {
     if (!response.ok) throw new Error(data.error || "Failed to delete subarticle");
     return data;
 }
+
+// --- Uploads ---
+
+export async function uploadImage(token, file) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/upload`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Failed to upload image");
+    return data;
+}

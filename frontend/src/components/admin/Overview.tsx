@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
     login, 
     getCategories, 
@@ -16,8 +16,12 @@ import {
     getSubArticles,
     createSubArticle,
     updateSubArticle,
-    deleteSubArticle
+    deleteSubArticle,
+    uploadImage
 } from '../../api';
+// @ts-ignore
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface Category {
     id: number;
@@ -39,6 +43,8 @@ interface Article {
     subcategory_id: number;
     title: string;
     content: string;
+    image_url?: string;
+    video_url?: string;
     subarticles?: SubArticle[];
 }
 
@@ -47,6 +53,8 @@ interface SubArticle {
     article_id: number;
     title: string;
     content: string;
+    image_url?: string;
+    video_url?: string;
 }
 
 const Overview = () => {
@@ -54,6 +62,7 @@ const Overview = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     // Categories State
     const [categories, setCategories] = useState<Category[]>([]);
@@ -70,13 +79,93 @@ const Overview = () => {
     // SubArticles State
     const [subarticles, setSubarticles] = useState<SubArticle[]>([]);
 
+    const quillRef = useRef<any>(null);
+    const [lastRange, setLastRange] = useState<any>(null);
+
+    const imageHandler = React.useCallback(() => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files?.[0];
+            if (file && token) {
+                try {
+                    const data = await uploadImage(token, file);
+                    const quill = quillRef.current.getEditor();
+                    const range = quill.getSelection();
+                    const index = range ? range.index : quill.getLength();
+                    const html = `<img src="http://localhost:8080${data.image_url}" style="width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;" />`;
+                    quill.clipboard.dangerouslyPasteHTML(index, html);
+                } catch (err: any) {
+                    setError('Image upload failed: ' + err.message);
+                }
+            }
+        };
+    }, [token]);
+
+    const videoHandler = React.useCallback(() => {
+        const url = prompt('Enter YouTube Video URL:');
+        if (url) {
+            let videoId = '';
+            if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.includes('youtube.com/watch?v=')) {
+                videoId = url.split('v=')[1].split('&')[0];
+            } else if (url.includes('youtube.com/embed/')) {
+                videoId = url.split('embed/')[1].split('?')[0];
+            }
+
+            if (videoId) {
+                const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                const quill = quillRef.current.getEditor();
+                const range = quill.getSelection();
+                const index = range ? range.index : quill.getLength();
+                const html = `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${embedUrl}" width="770" height="468" style="display: block; margin: 1rem auto; max-width: 100%;"></iframe>`;
+                quill.clipboard.dangerouslyPasteHTML(index, html);
+            } else {
+                alert('Invalid YouTube URL');
+            }
+        }
+    }, []);
+
+    const quillModules = React.useMemo(() => ({
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['link', 'blockquote', 'code-block'],
+                ['image', 'video'],
+                ['clean']
+            ],
+            handlers: {
+                image: imageHandler,
+                video: videoHandler
+            }
+        }
+    }), [imageHandler, videoHandler]);
+
     // Modal State
     const [modalType, setModalType] = useState<'category' | 'subcategory' | 'article' | 'subarticle' | null>(null);
+
+    const handleEditorChange = (content: string, delta: any, source: any, editor: any) => {
+        setFormContent(content);
+        setLastRange(editor.getSelection());
+    };
     const [editingItem, setEditingItem] = useState<any | null>(null);
     const [formName, setFormName] = useState('');
     const [formDescription, setFormDescription] = useState('');
     const [formTitle, setFormTitle] = useState('');
     const [formContent, setFormContent] = useState('');
+    const [formImageURL, setFormImageURL] = useState('');
+    const [formVideoURL, setFormVideoURL] = useState('');
 
     useEffect(() => {
         if (token) {
@@ -157,6 +246,8 @@ const Overview = () => {
         setFormDescription(category ? category.description : '');
         setFormTitle('');
         setFormContent('');
+        setFormImageURL('');
+        setFormVideoURL('');
     };
 
     const openSubCategoryModal = (subcategory: SubCategory | null = null) => {
@@ -166,6 +257,8 @@ const Overview = () => {
         setFormDescription(subcategory ? subcategory.description : '');
         setFormTitle('');
         setFormContent('');
+        setFormImageURL('');
+        setFormVideoURL('');
     };
 
     const openArticleModal = (article: Article | null = null) => {
@@ -173,6 +266,8 @@ const Overview = () => {
         setEditingItem(article);
         setFormTitle(article ? article.title : '');
         setFormContent(article ? article.content : '');
+        setFormImageURL(article ? article.image_url || '' : '');
+        setFormVideoURL(article ? article.video_url || '' : '');
         setFormName('');
         setFormDescription('');
     };
@@ -182,6 +277,8 @@ const Overview = () => {
         setEditingItem(subarticle);
         setFormTitle(subarticle ? subarticle.title : '');
         setFormContent(subarticle ? subarticle.content : '');
+        setFormImageURL(subarticle ? subarticle.image_url || '' : '');
+        setFormVideoURL(subarticle ? subarticle.video_url || '' : '');
         setFormName('');
         setFormDescription('');
     };
@@ -189,6 +286,23 @@ const Overview = () => {
     const closeModals = () => {
         setModalType(null);
         setEditingItem(null);
+    };
+
+    // --- Image Upload ---
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        setError(null);
+        try {
+            const data = await uploadImage(token!, file);
+            setFormImageURL(data.image_url);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setUploading(false);
+        }
     };
 
     // --- Save Handlers ---
@@ -212,17 +326,31 @@ const Overview = () => {
                 }
                 fetchSubCategories(activeCategory!.id);
             } else if (modalType === 'article') {
+                const articleData = { 
+                    subcategory_id: activeSubCategory!.id, 
+                    title: formTitle, 
+                    content: formContent,
+                    image_url: formImageURL,
+                    video_url: formVideoURL
+                };
                 if (editingItem) {
-                    await updateArticle(token, editingItem.id, { subcategory_id: activeSubCategory!.id, title: formTitle, content: formContent });
+                    await updateArticle(token, editingItem.id, articleData);
                 } else {
-                    await createArticle(token, { subcategory_id: activeSubCategory!.id, title: formTitle, content: formContent });
+                    await createArticle(token, articleData);
                 }
                 fetchArticles(activeSubCategory!.id);
             } else if (modalType === 'subarticle') {
+                const subArticleData = { 
+                    article_id: activeArticle!.id, 
+                    title: formTitle, 
+                    content: formContent,
+                    image_url: formImageURL,
+                    video_url: formVideoURL
+                };
                 if (editingItem) {
-                    await updateSubArticle(token, editingItem.id, { article_id: activeArticle!.id, title: formTitle, content: formContent });
+                    await updateSubArticle(token, editingItem.id, subArticleData);
                 } else {
-                    await createSubArticle(token, { article_id: activeArticle!.id, title: formTitle, content: formContent });
+                    await createSubArticle(token, subArticleData);
                 }
                 fetchSubArticles(activeArticle!.id);
             }
@@ -470,7 +598,7 @@ const Overview = () => {
             {/* Generic Modal */}
             {modalType && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
+                    <div className="card" style={{ width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <h3>{editingItem ? 'Edit' : 'Add'} {modalType.charAt(0).toUpperCase() + modalType.slice(1)}</h3>
                         <form className="form" onSubmit={handleSave}>
                             {modalType === 'article' || modalType === 'subarticle' ? (
@@ -481,7 +609,32 @@ const Overview = () => {
                                     </div>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Content</label>
-                                        <textarea value={formContent} onChange={(e) => setFormContent(e.target.value)} rows={10} required />
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <ReactQuill 
+                                                ref={quillRef}
+                                                theme="snow"
+                                                value={formContent} 
+                                                onChange={handleEditorChange}
+                                                onBlur={(range: any, source: any, editor: any) => setLastRange(range)}
+                                                modules={quillModules}
+                                                style={{ backgroundColor: 'white' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Featured Image</label>
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                        {uploading && <p>Uploading...</p>}
+                                        {formImageURL && (
+                                            <div style={{ marginTop: '0.5rem' }}>
+                                                <img src={`http://localhost:8080${formImageURL}`} alt="Preview" style={{ maxWidth: '200px', borderRadius: '4px' }} />
+                                                <button type="button" className="link-button" style={{ color: '#dc2626', display: 'block' }} onClick={() => setFormImageURL('')}>Remove Image</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>YouTube Video URL</label>
+                                        <input type="text" value={formVideoURL} onChange={(e) => setFormVideoURL(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
                                     </div>
                                 </>
                             ) : (

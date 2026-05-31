@@ -4,7 +4,6 @@
 
 body {
     margin: 0;
-    /*background: #f4f6f8;*/
     color: #1f2937;
     font-family: Arial, sans-serif;
 }
@@ -46,8 +45,6 @@ textarea {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    /*margin-bottom: 2rem;*/
-    /*padding-bottom: 1rem;*/
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -201,4 +198,36 @@ textarea {
 
 .post-card small {
     color: #64748b;
+}
+
+/* Quill Editor Styles */
+.ql-container {
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.ql-toolbar {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background: #f9fafb;
+}
+
+.ql-editor {
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.ql-editor img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.ql-editor iframe.ql-video {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
 }

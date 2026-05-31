@@ -6,12 +6,16 @@ interface SubArticle {
     id: number;
     title: string;
     content: string;
+    image_url?: string;
+    video_url?: string;
 }
 
 interface Article {
     id: number;
     title: string;
     content: string;
+    image_url?: string;
+    video_url?: string;
     created_at: string;
     subarticles?: SubArticle[];
 }
@@ -33,6 +37,19 @@ const Details = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedSaId, setSelectedSaId] = useState<number | null>(null);
+
+    const getYouTubeEmbedUrl = (url?: string) => {
+        if (!url) return null;
+        let videoId = '';
+        if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/watch?v=')) {
+            videoId = url.split('v=')[1].split('&')[0];
+        } else if (url.includes('youtube.com/embed/')) {
+            videoId = url.split('embed/')[1].split('?')[0];
+        }
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    };
 
     useEffect(() => {
         if (subCategoryId) {
@@ -89,28 +106,64 @@ const Details = () => {
                                             <article className="article" key={article.id} style={{
                                                 boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
                                                 borderRadius: '8px',
-                                                backgroundColor: '#fff'
+                                                backgroundColor: '#fff',
+                                                overflow: 'hidden'
                                             }}>
-                                                <h2 className="title" style={{ color: '#2c4964', marginBottom: '1rem' }}>{article.title}</h2>
+                                                <h2 className="title" style={{ color: '#2c4964', padding: '1.5rem 1.5rem 0.5rem 1.5rem', marginBottom: 0 }}>{article.title}</h2>
 
                                                 {/* Only show main article content if no specific subarticle is selected */}
                                                 {!selectedSaId && (
-                                                    <div className="content" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
-                                                        <div dangerouslySetInnerHTML={{ __html: article.content.replace(/\n/g, '<br/>') }} />
+                                                    <div className="content" style={{ padding: '0 1.5rem 1.5rem 1.5rem', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                                                        {article.image_url && (
+                                                            <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden' }}>
+                                                                <img src={`http://localhost:8080${article.image_url}`} alt={article.title} style={{ width: '100%', height: 'auto' }} />
+                                                            </div>
+                                                        )}
+                                                        <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                                                        
+                                                        {article.video_url && getYouTubeEmbedUrl(article.video_url) && (
+                                                            <div style={{ marginTop: '1.5rem', borderRadius: '8px', overflow: 'hidden', position: 'relative', paddingTop: '56.25%' }}>
+                                                                <iframe 
+                                                                    src={getYouTubeEmbedUrl(article.video_url)!}
+                                                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                                    allowFullScreen
+                                                                    title="YouTube video player"
+                                                                ></iframe>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
 
                                                 {subsToShow && subsToShow.length > 0 && (
                                                     <div className="subarticles" style={{ 
                                                         marginTop: selectedSaId ? '0' : '2.5rem', 
-                                                        paddingLeft: '1.5rem',
                                                         backgroundColor: '#f8f9fa',
                                                         padding: '1.5rem'
                                                     }}>
                                                         {subsToShow.map((sa) => (
                                                             <div key={sa.id} style={{ marginBottom: selectedSaId ? '0' : '2rem' }}>
                                                                 <h4 style={{ fontWeight: 'bold', color: '#1977cc' }}>{sa.title}</h4>
-                                                                <div style={{ fontSize: '1rem' }} dangerouslySetInnerHTML={{ __html: sa.content.replace(/\n/g, '<br/>') }} />
+                                                                
+                                                                {sa.image_url && (
+                                                                    <div style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
+                                                                        <img src={`http://localhost:8080${sa.image_url}`} alt={sa.title} style={{ width: '100%', height: 'auto' }} />
+                                                                    </div>
+                                                                )}
+                                                                
+                                                                <div style={{ fontSize: '1rem' }} dangerouslySetInnerHTML={{ __html: sa.content }} />
+                                                                
+                                                                {sa.video_url && getYouTubeEmbedUrl(sa.video_url) && (
+                                                                    <div style={{ marginTop: '1rem', borderRadius: '8px', overflow: 'hidden', position: 'relative', paddingTop: '56.25%' }}>
+                                                                        <iframe 
+                                                                            src={getYouTubeEmbedUrl(sa.video_url)!}
+                                                                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                                            allowFullScreen
+                                                                            title="YouTube video player"
+                                                                        ></iframe>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -143,9 +196,6 @@ const Details = () => {
                                     {subcategory.name}
                                 </h3>
                                 
-                                {/*<h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#2c4964', marginBottom: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>*/}
-                                {/*    Contents*/}
-                                {/*</h4>*/}
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
                                     <li style={{ marginBottom: '0.75rem' }}>
                                         <a 
