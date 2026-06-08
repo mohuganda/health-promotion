@@ -59,3 +59,4 @@ jspm_packages
 # build output of `jsx-email`
 /.rendered
 .idea/
+backend/uploads/*
