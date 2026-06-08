@@ -14,6 +14,7 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile.dev
     container_name: promotions_backend
     environment:
       DATABASE_URL: postgres://postsuser:postspassword@postgres:5432/promotions_db?sslmode=disable
@@ -23,15 +24,22 @@ services:
       PORT: 8080
     ports:
       - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - /app/tmp
     depends_on:
       - postgres
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: promotions_frontend
     ports:
-      - "3000:80"
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 

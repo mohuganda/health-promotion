@@ -81,8 +81,8 @@ const Details = () => {
                     <h1 className="mb-2 mb-lg-0">{subcategory.name}</h1>
                     <nav className="breadcrumbs">
                         <ol>
-                            <li><a onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>Home</a></li>
-                            <li className="current">{subcategory.name} Details</li>
+                            <li><a onClick={() => navigate('/categories')} style={{ cursor: 'pointer' }}>Categories</a></li>
+                            <li className="current">{subcategory.name}</li>
                         </ol>
                     </nav>
                 </div>
@@ -109,14 +109,14 @@ const Details = () => {
                                                 backgroundColor: '#fff',
                                                 overflow: 'hidden'
                                             }}>
-                                                <h2 className="title" style={{ color: '#2c4964', padding: '1.5rem 1.5rem 0.5rem 1.5rem', marginBottom: 0 }}>{article.title}</h2>
+                                                <h2 className="title">{article.title}</h2>
 
                                                 {/* Only show main article content if no specific subarticle is selected */}
                                                 {!selectedSaId && (
-                                                    <div className="content" style={{ padding: '0 1.5rem 1.5rem 1.5rem', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                                                    <div className="content">
                                                         {article.image_url && (
                                                             <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                <img src={`http://localhost:8080${article.image_url}`} alt={article.title} style={{ width: '100%', height: 'auto' }} />
+                                                                <img src={`http://localhost:8080${article.image_url}`} alt={article.title} className={`content-image-style`} />
                                                             </div>
                                                         )}
                                                         <div dangerouslySetInnerHTML={{ __html: article.content }} />
@@ -147,7 +147,7 @@ const Details = () => {
                                                                 
                                                                 {sa.image_url && (
                                                                     <div style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                        <img src={`http://localhost:8080${sa.image_url}`} alt={sa.title} style={{ width: '100%', height: 'auto' }} />
+                                                                        <img src={`http://localhost:8080${sa.image_url}`} alt={sa.title} className={`content-image-style`} />
                                                                     </div>
                                                                 )}
                                                                 

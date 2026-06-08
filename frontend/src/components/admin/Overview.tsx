@@ -96,7 +96,7 @@ const Overview = () => {
                     const quill = quillRef.current.getEditor();
                     const range = quill.getSelection();
                     const index = range ? range.index : quill.getLength();
-                    const html = `<img src="http://localhost:8080${data.image_url}" style="width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;" />`;
+                    const html = `<img class="content-image-style" src="http://localhost:8080${data.image_url}" alt="${file.name}"/>`;
                     quill.clipboard.dangerouslyPasteHTML(index, html);
                 } catch (err: any) {
                     setError('Image upload failed: ' + err.message);
@@ -122,7 +122,7 @@ const Overview = () => {
                 const quill = quillRef.current.getEditor();
                 const range = quill.getSelection();
                 const index = range ? range.index : quill.getLength();
-                const html = `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${embedUrl}" width="770" height="468" style="display: block; margin: 1rem auto; max-width: 100%;"></iframe>`;
+                const html = `<iframe class="ql-video" allowfullscreen="allowfullscreen" src="${embedUrl}" width="730" height="468"></iframe>`;
                 quill.clipboard.dangerouslyPasteHTML(index, html);
             } else {
                 alert('Invalid YouTube URL');
@@ -424,7 +424,7 @@ const Overview = () => {
     return (
         <div className="app">
             <div className="section-header">
-                <h1>Admin Overview</h1>
+                <h3>Admin Overview</h3>
                 <button onClick={handleLogout} className="secondary-button">Logout</button>
             </div>
 
@@ -457,30 +457,30 @@ const Overview = () => {
             {!activeCategory ? (
                 <div className="card">
                     <div className="section-header">
-                        <h2>Disease Categories</h2>
+                        <h4>Disease Categories</h4>
                         <button onClick={() => openCategoryModal()}>Add Category</button>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                             <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
                                 <th style={{ padding: '0.75rem' }}>Name</th>
-                                <th style={{ padding: '0.75rem' }}>Description</th>
-                                <th style={{ padding: '0.75rem' }}>Subcategories</th>
+                                <th>Description</th>
+                                <th>Subcategories</th>
                                 <th style={{ padding: '0.75rem' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {categories.map((c) => (
                                 <tr key={c.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                    <td style={{ padding: '0.75rem' }}>
-                                        <button className="link-button" onClick={() => { setActiveCategory(c); fetchSubCategories(c.id); }}>{c.name}</button>
+                                    <td>
+                                        <button className="link-button item-category" onClick={() => { setActiveCategory(c); fetchSubCategories(c.id); }}>{c.name}</button>
                                     </td>
-                                    <td style={{ padding: '0.75rem' }}>{c.description}</td>
-                                    <td style={{ padding: '0.75rem' }}>{c.subcategories?.length || 0}</td>
-                                    <td style={{ padding: '0.75rem' }}>
+                                    <td>{c.description}</td>
+                                    <td>{c.subcategories?.length || 0}</td>
+                                    <td>
                                         <div className="actions" style={{ marginTop: 0 }}>
-                                            <button className="link-button" style={{ color: '#2563eb' }} onClick={() => openCategoryModal(c)}>Edit</button>
-                                            <button className="link-button" style={{ color: '#dc2626' }} onClick={() => handleDeleteCategory(c.id)}>Delete</button>
+                                            <button className="link-button item-edit" onClick={() => openCategoryModal(c)}>Edit</button>
+                                            <button className="link-button item-delete" onClick={() => handleDeleteCategory(c.id)}>Delete</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -491,30 +491,30 @@ const Overview = () => {
             ) : !activeSubCategory ? (
                 <div className="card">
                     <div className="section-header">
-                        <h2>Subcategories of "{activeCategory.name}"</h2>
+                        <h4>Subcategories of "{activeCategory.name}"</h4>
                         <button onClick={() => openSubCategoryModal()}>Add Subcategory</button>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                             <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
                                 <th style={{ padding: '0.75rem' }}>Name</th>
-                                <th style={{ padding: '0.75rem' }}>Description</th>
-                                <th style={{ padding: '0.75rem' }}>Articles</th>
+                                <th>Description</th>
+                                <th>Articles</th>
                                 <th style={{ padding: '0.75rem' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {subcategories.map((sc) => (
                                 <tr key={sc.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                    <td style={{ padding: '0.75rem' }}>
-                                        <button className="link-button" onClick={() => { setActiveSubCategory(sc); fetchArticles(sc.id); }}>{sc.name}</button>
+                                    <td>
+                                        <button className="link-button item-category" onClick={() => { setActiveSubCategory(sc); fetchArticles(sc.id); }}>{sc.name}</button>
                                     </td>
-                                    <td style={{ padding: '0.75rem' }}>{sc.description}</td>
-                                    <td style={{ padding: '0.75rem' }}>{sc.articles?.length || 0}</td>
-                                    <td style={{ padding: '0.75rem' }}>
+                                    <td>{sc.description}</td>
+                                    <td>{sc.articles?.length || 0}</td>
+                                    <td>
                                         <div className="actions" style={{ marginTop: 0 }}>
-                                            <button className="link-button" style={{ color: '#2563eb' }} onClick={() => openSubCategoryModal(sc)}>Edit</button>
-                                            <button className="link-button" style={{ color: '#dc2626' }} onClick={() => handleDeleteSubCategory(sc.id)}>Delete</button>
+                                            <button className="link-button item-edit" onClick={() => openSubCategoryModal(sc)}>Edit</button>
+                                            <button className="link-button item-delete" onClick={() => handleDeleteSubCategory(sc.id)}>Delete</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -528,28 +528,28 @@ const Overview = () => {
             ) : !activeArticle ? (
                 <div className="card">
                     <div className="section-header">
-                        <h2>Articles in "{activeSubCategory.name}"</h2>
+                        <h4>Articles in "{activeSubCategory.name}"</h4>
                         <button onClick={() => openArticleModal()}>Add Article</button>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                             <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
                                 <th style={{ padding: '0.75rem' }}>Title</th>
-                                <th style={{ padding: '0.75rem' }}>Content Preview</th>
+                                <th>Content Preview</th>
                                 <th style={{ padding: '0.75rem' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {articles.map((a) => (
                                 <tr key={a.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                    <td style={{ padding: '0.75rem' }}>
-                                        <button className="link-button" onClick={() => { setActiveArticle(a); fetchSubArticles(a.id); }}>{a.title}</button>
+                                    <td>
+                                        <button className="link-button item-category" onClick={() => { setActiveArticle(a); fetchSubArticles(a.id); }}>{a.title}</button>
                                     </td>
-                                    <td style={{ padding: '0.75rem' }}>{a.content.substring(0, 100)}...</td>
-                                    <td style={{ padding: '0.75rem' }}>
+                                    <td>{a.content.substring(0, 120)}...</td>
+                                    <td>
                                         <div className="actions" style={{ marginTop: 0 }}>
-                                            <button className="link-button" style={{ color: '#2563eb' }} onClick={() => openArticleModal(a)}>Edit</button>
-                                            <button className="link-button" style={{ color: '#dc2626' }} onClick={() => handleDeleteArticle(a.id)}>Delete</button>
+                                            <button className="link-button item-edit" onClick={() => openArticleModal(a)}>Edit</button>
+                                            <button className="link-button item-delete" onClick={() => handleDeleteArticle(a.id)}>Delete</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -563,7 +563,7 @@ const Overview = () => {
             ) : (
                 <div className="card">
                     <div className="section-header">
-                        <h2>Sub-Articles of "{activeArticle.title}"</h2>
+                        <h4>Sub-Articles of "{activeArticle.title}"</h4>
                         <button onClick={() => openSubArticleModal()}>Add Sub-Article</button>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
