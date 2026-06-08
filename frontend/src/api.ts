@@ -1,5 +1,18 @@
 const API_BASE_URL = "http://localhost:8080/api";
 
+async function handleResponse(response, skipRedirect = false) {
+    if (response.status === 401 && !skipRedirect) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/admin';
+        throw new Error("Session expired. Please login again.");
+    }
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Request failed");
+    }
+    return data;
+}
+
 export async function login(username, password) {
     const response = await fetch(`${API_BASE_URL}/admin/login`, {
         method: "POST",
@@ -9,21 +22,14 @@ export async function login(username, password) {
         body: JSON.stringify({ username, password })
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-    }
-
-    return data;
+    return handleResponse(response, true);
 }
 
 // --- Categories ---
 
 export async function getCategories() {
     const response = await fetch(`${API_BASE_URL}/categories`);
-    if (!response.ok) throw new Error("Failed to fetch categories");
-    return response.json();
+    return handleResponse(response);
 }
 
 export async function createCategory(token, category) {
@@ -35,9 +41,7 @@ export async function createCategory(token, category) {
         },
         body: JSON.stringify(category)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to create category");
-    return data;
+    return handleResponse(response);
 }
 
 export async function updateCategory(token, id, category) {
@@ -49,9 +53,7 @@ export async function updateCategory(token, id, category) {
         },
         body: JSON.stringify(category)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to update category");
-    return data;
+    return handleResponse(response);
 }
 
 export async function deleteCategory(token, id) {
@@ -61,9 +63,7 @@ export async function deleteCategory(token, id) {
             Authorization: `Bearer ${token}`
         }
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to delete category");
-    return data;
+    return handleResponse(response);
 }
 
 // --- SubCategories ---
@@ -71,14 +71,12 @@ export async function deleteCategory(token, id) {
 export async function getSubCategories(category_id) {
     const url = category_id ? `${API_BASE_URL}/subcategories?category_id=${category_id}` : `${API_BASE_URL}/subcategories`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch subcategories");
-    return response.json();
+    return handleResponse(response);
 }
 
 export async function getSubCategory(id) {
     const response = await fetch(`${API_BASE_URL}/subcategories/${id}`);
-    if (!response.ok) throw new Error("Failed to fetch subcategory");
-    return response.json();
+    return handleResponse(response);
 }
 
 export async function createSubCategory(token, subcategory) {
@@ -90,9 +88,7 @@ export async function createSubCategory(token, subcategory) {
         },
         body: JSON.stringify(subcategory)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to create subcategory");
-    return data;
+    return handleResponse(response);
 }
 
 export async function updateSubCategory(token, id, subcategory) {
@@ -104,9 +100,7 @@ export async function updateSubCategory(token, id, subcategory) {
         },
         body: JSON.stringify(subcategory)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to update subcategory");
-    return data;
+    return handleResponse(response);
 }
 
 export async function deleteSubCategory(token, id) {
@@ -116,9 +110,7 @@ export async function deleteSubCategory(token, id) {
             Authorization: `Bearer ${token}`
         }
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to delete subcategory");
-    return data;
+    return handleResponse(response);
 }
 
 // --- Articles ---
@@ -126,8 +118,7 @@ export async function deleteSubCategory(token, id) {
 export async function getArticles(subcategory_id) {
     const url = subcategory_id ? `${API_BASE_URL}/articles?subcategory_id=${subcategory_id}` : `${API_BASE_URL}/articles`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch articles");
-    return response.json();
+    return handleResponse(response);
 }
 
 export async function createArticle(token, article) {
@@ -139,9 +130,7 @@ export async function createArticle(token, article) {
         },
         body: JSON.stringify(article)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to create article");
-    return data;
+    return handleResponse(response);
 }
 
 export async function updateArticle(token, id, article) {
@@ -153,9 +142,7 @@ export async function updateArticle(token, id, article) {
         },
         body: JSON.stringify(article)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to update article");
-    return data;
+    return handleResponse(response);
 }
 
 export async function deleteArticle(token, id) {
@@ -165,9 +152,7 @@ export async function deleteArticle(token, id) {
             Authorization: `Bearer ${token}`
         }
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to delete article");
-    return data;
+    return handleResponse(response);
 }
 
 // --- SubArticles ---
@@ -175,8 +160,7 @@ export async function deleteArticle(token, id) {
 export async function getSubArticles(article_id) {
     const url = article_id ? `${API_BASE_URL}/subarticles?article_id=${article_id}` : `${API_BASE_URL}/subarticles`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch subarticles");
-    return response.json();
+    return handleResponse(response);
 }
 
 export async function createSubArticle(token, subarticle) {
@@ -188,9 +172,7 @@ export async function createSubArticle(token, subarticle) {
         },
         body: JSON.stringify(subarticle)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to create subarticle");
-    return data;
+    return handleResponse(response);
 }
 
 export async function updateSubArticle(token, id, subarticle) {
@@ -202,9 +184,7 @@ export async function updateSubArticle(token, id, subarticle) {
         },
         body: JSON.stringify(subarticle)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to update subarticle");
-    return data;
+    return handleResponse(response);
 }
 
 export async function deleteSubArticle(token, id) {
@@ -214,9 +194,7 @@ export async function deleteSubArticle(token, id) {
             Authorization: `Bearer ${token}`
         }
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to delete subarticle");
-    return data;
+    return handleResponse(response);
 }
 
 // --- Uploads ---
@@ -233,7 +211,6 @@ export async function uploadImage(token, file) {
         body: formData
     });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Failed to upload image");
-    return data;
+    return handleResponse(response);
 }
+
