@@ -62,7 +62,6 @@ const Overview = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
 
     // Categories State
     const [categories, setCategories] = useState<Category[]>([]);
@@ -164,8 +163,6 @@ const Overview = () => {
     const [formDescription, setFormDescription] = useState('');
     const [formTitle, setFormTitle] = useState('');
     const [formContent, setFormContent] = useState('');
-    const [formImageURL, setFormImageURL] = useState('');
-    const [formVideoURL, setFormVideoURL] = useState('');
 
     useEffect(() => {
         if (token) {
@@ -246,8 +243,6 @@ const Overview = () => {
         setFormDescription(category ? category.description : '');
         setFormTitle('');
         setFormContent('');
-        setFormImageURL('');
-        setFormVideoURL('');
     };
 
     const openSubCategoryModal = (subcategory: SubCategory | null = null) => {
@@ -257,8 +252,6 @@ const Overview = () => {
         setFormDescription(subcategory ? subcategory.description : '');
         setFormTitle('');
         setFormContent('');
-        setFormImageURL('');
-        setFormVideoURL('');
     };
 
     const openArticleModal = (article: Article | null = null) => {
@@ -266,8 +259,6 @@ const Overview = () => {
         setEditingItem(article);
         setFormTitle(article ? article.title : '');
         setFormContent(article ? article.content : '');
-        setFormImageURL(article ? article.image_url || '' : '');
-        setFormVideoURL(article ? article.video_url || '' : '');
         setFormName('');
         setFormDescription('');
     };
@@ -277,8 +268,6 @@ const Overview = () => {
         setEditingItem(subarticle);
         setFormTitle(subarticle ? subarticle.title : '');
         setFormContent(subarticle ? subarticle.content : '');
-        setFormImageURL(subarticle ? subarticle.image_url || '' : '');
-        setFormVideoURL(subarticle ? subarticle.video_url || '' : '');
         setFormName('');
         setFormDescription('');
     };
@@ -286,23 +275,6 @@ const Overview = () => {
     const closeModals = () => {
         setModalType(null);
         setEditingItem(null);
-    };
-
-    // --- Image Upload ---
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploading(true);
-        setError(null);
-        try {
-            const data = await uploadImage(token!, file);
-            setFormImageURL(data.image_url);
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setUploading(false);
-        }
     };
 
     // --- Save Handlers ---
@@ -329,9 +301,7 @@ const Overview = () => {
                 const articleData = { 
                     subcategory_id: activeSubCategory!.id, 
                     title: formTitle, 
-                    content: formContent,
-                    image_url: formImageURL,
-                    video_url: formVideoURL
+                    content: formContent
                 };
                 if (editingItem) {
                     await updateArticle(token, editingItem.id, articleData);
@@ -343,9 +313,7 @@ const Overview = () => {
                 const subArticleData = { 
                     article_id: activeArticle!.id, 
                     title: formTitle, 
-                    content: formContent,
-                    image_url: formImageURL,
-                    video_url: formVideoURL
+                    content: formContent
                 };
                 if (editingItem) {
                     await updateSubArticle(token, editingItem.id, subArticleData);
@@ -620,21 +588,6 @@ const Overview = () => {
                                                 style={{ backgroundColor: 'white' }}
                                             />
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Featured Image</label>
-                                        <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-                                        {uploading && <p>Uploading...</p>}
-                                        {formImageURL && (
-                                            <div style={{ marginTop: '0.5rem' }}>
-                                                <img src={`http://localhost:8080${formImageURL}`} alt="Preview" style={{ maxWidth: '200px', borderRadius: '4px' }} />
-                                                <button type="button" className="link-button" style={{ color: '#dc2626', display: 'block' }} onClick={() => setFormImageURL('')}>Remove Image</button>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>YouTube Video URL</label>
-                                        <input type="text" value={formVideoURL} onChange={(e) => setFormVideoURL(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
                                     </div>
                                 </>
                             ) : (
