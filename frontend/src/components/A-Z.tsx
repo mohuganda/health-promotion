@@ -47,7 +47,7 @@ const A_Z = () => {
         <>
             <div className="page-title light-background">
                 <div className="container d-lg-flex justify-content-between align-items-center">
-                    <h1 className="mb-2 mb-lg-0">A-Z Health Topics</h1>
+                    <h1 className="mb-2 mb-lg-0">Health Experience Topic Listing</h1>
                     <nav className="breadcrumbs">
                         <ol>
                             <li><a onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>Home</a></li>

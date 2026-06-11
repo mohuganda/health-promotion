@@ -248,6 +248,16 @@ textarea {
     color: #2563eb;
 }
 
+.carousel-control-prev,
+.carousel-control-next {
+    background: transparent !important;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: transparent !important;
+}
+
 .item-edit {
     color: #6c757d;
 }

@@ -5,7 +5,7 @@ const FooterComponent = () => {
                 <div className="row gy-4">
                     <div className="col-lg-4 col-md-6 footer-about">
                         <a href="/" className="logo d-flex align-items-center">
-                            <span className="sitename">Health Promotions</span>
+                            <span className="sitename">Health Experience Uganda</span>
                         </a>
                         <div className="footer-contact pt-3">
                             <p>Lourdel Road</p>

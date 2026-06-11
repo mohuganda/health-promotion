@@ -6,7 +6,7 @@ const HeaderComponent = () => {
 
                 <a href="/" className="logo d-flex align-items-center me-auto">
                     <img src="/assets/img/logo.png" alt="logo-title"/>
-                    <h1 className="sitename">Health Promotions</h1>
+                    <h1 className="sitename">Health Experience Uganda</h1>
                 </a>
 
                 <nav id="navmenu" className="navmenu">

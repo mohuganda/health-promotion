@@ -95,7 +95,7 @@ const Overview = () => {
                     const quill = quillRef.current.getEditor();
                     const range = quill.getSelection();
                     const index = range ? range.index : quill.getLength();
-                    const html = `<img class="content-image-style" src="http://localhost:8080${data.image_url}" alt="${file.name}"/>`;
+                    const html = `<img class="content-image-style" src="http://localhost:8421${data.image_url}" alt="${file.name}"/>`;
                     quill.clipboard.dangerouslyPasteHTML(index, html);
                 } catch (err: any) {
                     setError('Image upload failed: ' + err.message);
@@ -121,7 +121,7 @@ const Overview = () => {
                 const quill = quillRef.current.getEditor();
                 const range = quill.getSelection();
                 const index = range ? range.index : quill.getLength();
-                const html = `<iframe class="ql-video" allowfullscreen="allowfullscreen" src="${embedUrl}" width="730" height="468"></iframe>`;
+                const html = `<iframe class="ql-video" allowfullscreen="allowfullscreen" src="${embedUrl}" width="100%" height="468"></iframe>`;
                 quill.clipboard.dangerouslyPasteHTML(index, html);
             } else {
                 alert('Invalid YouTube URL');

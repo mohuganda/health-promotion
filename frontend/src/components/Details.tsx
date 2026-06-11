@@ -116,7 +116,7 @@ const Details = () => {
                                                     <div className="content">
                                                         {article.image_url && (
                                                             <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                <img src={`http://localhost:8080${article.image_url}`} alt={article.title} className={`content-image-style`} />
+                                                                <img src={`http://localhost:8421${article.image_url}`} alt={article.title} className={`content-image-style`} />
                                                             </div>
                                                         )}
                                                         <div dangerouslySetInnerHTML={{ __html: article.content }} />
@@ -147,7 +147,7 @@ const Details = () => {
                                                                 
                                                                 {sa.image_url && (
                                                                     <div style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                        <img src={`http://localhost:8080${sa.image_url}`} alt={sa.title} className={`content-image-style`} />
+                                                                        <img src={`http://localhost:8421${sa.image_url}`} alt={sa.title} className={`content-image-style`} />
                                                                     </div>
                                                                 )}
                                                                 
