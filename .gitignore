@@ -50,8 +50,7 @@ jspm_packages
 
 .DS_Store
 
-/dist
-
+dist/
 /dist_keycloak
 /build
 /storybook-static

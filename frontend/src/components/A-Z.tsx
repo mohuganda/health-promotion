@@ -17,7 +17,14 @@ const A_Z = () => {
     useEffect(() => {
         getSubCategories()
             .then(data => {
-                setSubcategories(data.sort((a: SubCategory, b: SubCategory) => a.name.localeCompare(b.name)));
+                if (data && Array.isArray(data)) {
+                    const sorted = [...data].sort((a: SubCategory, b: SubCategory) => 
+                        (a.name || '').localeCompare(b.name || '')
+                    );
+                    setSubcategories(sorted);
+                } else {
+                    setSubcategories([]);
+                }
                 setLoading(false);
             })
             .catch(err => {
@@ -26,17 +33,21 @@ const A_Z = () => {
             });
     }, []);
 
-    const filteredSubcategories = subcategories.filter(sub => 
-        sub.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredSubcategories = (subcategories || []).filter(sub => 
+        sub && sub.name && sub.name.toLowerCase().includes((searchTerm || '').toLowerCase())
     );
 
     const groupedSubcategories: { [key: string]: SubCategory[] } = {};
     filteredSubcategories.forEach(sub => {
-        const firstLetter = sub.name.charAt(0).toUpperCase();
-        if (!groupedSubcategories[firstLetter]) {
-            groupedSubcategories[firstLetter] = [];
+        if (sub && sub.name) {
+            const firstLetter = sub.name.charAt(0).toUpperCase();
+            if (firstLetter) {
+                if (!groupedSubcategories[firstLetter]) {
+                    groupedSubcategories[firstLetter] = [];
+                }
+                groupedSubcategories[firstLetter].push(sub);
+            }
         }
-        groupedSubcategories[firstLetter].push(sub);
     });
 
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");

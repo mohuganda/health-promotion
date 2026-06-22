@@ -68,7 +68,7 @@ export async function deleteCategory(token, id) {
 
 // --- SubCategories ---
 
-export async function getSubCategories(category_id) {
+export async function getSubCategories(category_id?: number | boolean) {
     const url = category_id ? `${API_BASE_URL}/subcategories?category_id=${category_id}` : `${API_BASE_URL}/subcategories`;
     const response = await fetch(url);
     return handleResponse(response);
