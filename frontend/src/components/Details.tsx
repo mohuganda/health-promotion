@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getSubCategory, getSubCategories } from '../api';
+import { SERVER_BASE_URL, getSubCategory, getSubCategories } from '../api';
 
 interface SubArticle {
     id: number;
@@ -54,7 +54,7 @@ const Details = () => {
     useEffect(() => {
         if (subCategoryId) {
             setLoading(true);
-            getSubCategory(subCategoryId)
+            getSubCategory(parseInt(subCategoryId, 10))
                 .then(data => {
                     setSubcategory(data);
                     setLoading(false);
@@ -72,7 +72,7 @@ const Details = () => {
     if (!subcategory) return <div className="container" style={{ padding: '5rem', textAlign: 'center' }}><h3>Subcategory not found</h3></div>;
 
     // Flatten all subarticles for the sidebar list
-    const allSubArticles = subcategory.articles?.flatMap(art => art.subarticles || []) || [];
+    const allSubArticles = subcategory.articles?.flatMap((art: any) => art.subarticles || []) || [];
 
     return (
         <>
@@ -94,9 +94,9 @@ const Details = () => {
                         <section id="blog-details" className="blog-details section-details">
                             <div className="container">
                                 {subcategory.articles && subcategory.articles.length > 0 ? (
-                                    subcategory.articles.map((article) => {
+                                    subcategory.articles.map((article: any) => {
                                         const subsToShow = selectedSaId 
-                                            ? article.subarticles?.filter(sa => sa.id === selectedSaId)
+                                            ? article.subarticles?.filter((sa: any) => sa.id === selectedSaId)
                                             : []; // Only show subarticles when one is specifically selected
                                         
                                         // If a subarticle is selected but doesn't belong to this article, don't render this article
@@ -116,7 +116,7 @@ const Details = () => {
                                                     <div className="content">
                                                         {article.image_url && (
                                                             <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                <img src={`http://localhost:8421${article.image_url}`} alt={article.title} className={`content-image-style`} />
+                                                                <img src={`${SERVER_BASE_URL}${article.image_url}`} alt={article.title} className={`content-image-style`} />
                                                             </div>
                                                         )}
                                                         <div dangerouslySetInnerHTML={{ __html: article.content }} />
@@ -141,13 +141,13 @@ const Details = () => {
                                                         backgroundColor: '#f8f9fa',
                                                         padding: '1.5rem'
                                                     }}>
-                                                        {subsToShow.map((sa) => (
+                                                        {subsToShow && subsToShow.length > 0 && subsToShow.map((sa: any) => (
                                                             <div key={sa.id} style={{ marginBottom: selectedSaId ? '0' : '2rem' }}>
                                                                 <h4 style={{ fontWeight: 'bold', color: '#1977cc' }}>{sa.title}</h4>
                                                                 
                                                                 {sa.image_url && (
                                                                     <div style={{ marginBottom: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
-                                                                        <img src={`http://localhost:8421${sa.image_url}`} alt={sa.title} className={`content-image-style`} />
+                                                                        <img src={`${SERVER_BASE_URL}${sa.image_url}`} alt={sa.title} className={`content-image-style`} />
                                                                     </div>
                                                                 )}
                                                                 
@@ -212,7 +212,7 @@ const Details = () => {
                                             Overview
                                         </a>
                                     </li>
-                                    {allSubArticles.map(sa => (
+                                    {allSubArticles.map((sa: any) => (
                                         <li key={sa.id} style={{ marginBottom: '0.75rem' }}>
                                             <a 
                                                 onClick={() => setSelectedSaId(sa.id)} 

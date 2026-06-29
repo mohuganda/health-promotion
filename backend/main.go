@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -97,27 +98,53 @@ type SubArticleRequest struct {
 
 var db *sql.DB
 
+func loadEnv() {
+	file, err := os.Open(".env")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			if strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"") {
+				value = strings.Trim(value, "\"")
+			} else if strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'") {
+				value = strings.Trim(value, "'")
+			}
+			os.Setenv(key, value)
+		}
+	}
+}
+
+var (
+	Version   = "0.0.0-dev"
+	Commit    = "unknown"
+	BuildTime = "unknown"
+	Dirty     = "true"
+)
+
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Printf("moh-sso-dashboard-backend %s (commit %s, build_time %s, dirty=%s)\n",
+			Version, Commit, BuildTime, Dirty)
+		return
+	}
+
+	loadEnv()
 	dbHost := os.Getenv("DB_HOST")
-	if dbHost == "" {
-		dbHost = "localhost"
-	}
 	dbPort := os.Getenv("DB_PORT")
-	if dbPort == "" {
-		dbPort = "5432"
-	}
 	dbUser := os.Getenv("DB_USER")
-	if dbUser == "" {
-		dbUser = "postsuser"
-	}
 	dbPassword := os.Getenv("DB_PASSWORD")
-	if dbPassword == "" {
-		dbPassword = "postspassword"
-	}
 	dbName := os.Getenv("DB_NAME")
-	if dbName == "" {
-		dbName = "promotions_db"
-	}
 
 	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
@@ -355,14 +382,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	adminUsername := os.Getenv("ADMIN_USERNAME")
 	adminPassword := os.Getenv("ADMIN_PASSWORD")
-
-	if adminUsername == "" {
-		adminUsername = "admin"
-	}
-
-	if adminPassword == "" {
-		adminPassword = "admin123"
-	}
 
 	if req.Username != adminUsername || req.Password != adminPassword {
 		writeError(w, http.StatusUnauthorized, "invalid credentials")
@@ -1085,10 +1104,17 @@ func authMiddleware(next http.Handler) http.Handler {
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		allowedOrigin := os.Getenv("CORS_ORIGIN")
+		if allowedOrigin == "" {
+			allowedOrigin = "http://localhost:3218"
+		}
+
 		origin := r.Header.Get("Origin")
 
-		if origin == "http://localhost:3218" || origin == "http://127.0.0.1:3218" {
+		if origin == allowedOrigin || origin == "http://127.0.0.1:3218" || origin == "http://localhost:5173" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
+		} else if allowedOrigin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		} else {
 			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3218")
 		}

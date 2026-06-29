@@ -26,7 +26,7 @@ export default function Categories() {
                     setActiveTabId(data[0].id);
                 }
             })
-            .catch(err => console.error("Error fetching categories:", err));
+            .catch((err: any) => console.error("Error fetching categories:", err));
     }, []);
 
     return (
@@ -44,7 +44,7 @@ export default function Categories() {
                                 <li className="nav-item" key={category.id}>
                                     <a 
                                         className={`nav-link ${activeTabId === category.id ? 'active show' : ''}`}
-                                        onClick={(e) => { e.preventDefault(); setActiveTabId(category.id); }}
+                                        onClick={(e: React.MouseEvent) => { e.preventDefault(); setActiveTabId(category.id); }}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         {category.name}
@@ -69,7 +69,7 @@ export default function Categories() {
                                                 <div className="service-item d-flex position-relative h-100">
                                                     <h4 className="title">
                                                         <a 
-                                                            onClick={() => navigate(`/details?subcategory_id=${sub.id}`)}
+                                                            onClick={(e: React.MouseEvent) => navigate(`/details?subcategory_id=${sub.id}`)}
                                                             className="stretched-link"
                                                             style={{ cursor: 'pointer' }}
                                                         >

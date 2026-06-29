@@ -27,7 +27,7 @@ const A_Z = () => {
                 }
                 setLoading(false);
             })
-            .catch(err => {
+            .catch((err: any) => {
                 console.error("Error fetching subcategories:", err);
                 setLoading(false);
             });
@@ -79,7 +79,7 @@ const A_Z = () => {
                                         placeholder="Search for a health topic..." 
                                         className="form-control"
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                                         style={{ padding: '0.8rem 1.2rem', borderRadius: '30px', border: '1px solid #ddd' }}
                                     />
                                 </form>

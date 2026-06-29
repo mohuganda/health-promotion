@@ -59,3 +59,13 @@ dist/
 /.rendered
 .idea/
 backend/uploads/*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+backend/.env
+backend/.env.local
+frontend/.env
+frontend/.env.local

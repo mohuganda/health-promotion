@@ -1,6 +1,7 @@
-const API_BASE_URL = "http://localhost:8421/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8421/api";
+export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
 
-async function handleResponse(response, skipRedirect = false) {
+async function handleResponse(response: Response, skipRedirect: boolean = false): Promise<any> {
     if (response.status === 401 && !skipRedirect) {
         localStorage.removeItem('adminToken');
         window.location.href = '/admin';
@@ -13,7 +14,7 @@ async function handleResponse(response, skipRedirect = false) {
     return data;
 }
 
-export async function login(username, password) {
+export async function login(username: string, password: string): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/login`, {
         method: "POST",
         headers: {
@@ -32,7 +33,7 @@ export async function getCategories() {
     return handleResponse(response);
 }
 
-export async function createCategory(token, category) {
+export async function createCategory(token: string, category: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/categories`, {
         method: "POST",
         headers: {
@@ -44,7 +45,7 @@ export async function createCategory(token, category) {
     return handleResponse(response);
 }
 
-export async function updateCategory(token, id, category) {
+export async function updateCategory(token: string, id: number, category: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
         method: "PUT",
         headers: {
@@ -56,7 +57,7 @@ export async function updateCategory(token, id, category) {
     return handleResponse(response);
 }
 
-export async function deleteCategory(token, id) {
+export async function deleteCategory(token: string, id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
         method: "DELETE",
         headers: {
@@ -74,12 +75,12 @@ export async function getSubCategories(category_id?: number | boolean) {
     return handleResponse(response);
 }
 
-export async function getSubCategory(id) {
+export async function getSubCategory(id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/subcategories/${id}`);
     return handleResponse(response);
 }
 
-export async function createSubCategory(token, subcategory) {
+export async function createSubCategory(token: string, subcategory: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subcategories`, {
         method: "POST",
         headers: {
@@ -91,7 +92,7 @@ export async function createSubCategory(token, subcategory) {
     return handleResponse(response);
 }
 
-export async function updateSubCategory(token, id, subcategory) {
+export async function updateSubCategory(token: string, id: number, subcategory: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subcategories/${id}`, {
         method: "PUT",
         headers: {
@@ -103,7 +104,7 @@ export async function updateSubCategory(token, id, subcategory) {
     return handleResponse(response);
 }
 
-export async function deleteSubCategory(token, id) {
+export async function deleteSubCategory(token: string, id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subcategories/${id}`, {
         method: "DELETE",
         headers: {
@@ -115,13 +116,13 @@ export async function deleteSubCategory(token, id) {
 
 // --- Articles ---
 
-export async function getArticles(subcategory_id) {
+export async function getArticles(subcategory_id?: number): Promise<any> {
     const url = subcategory_id ? `${API_BASE_URL}/articles?subcategory_id=${subcategory_id}` : `${API_BASE_URL}/articles`;
     const response = await fetch(url);
     return handleResponse(response);
 }
 
-export async function createArticle(token, article) {
+export async function createArticle(token: string, article: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/articles`, {
         method: "POST",
         headers: {
@@ -133,7 +134,7 @@ export async function createArticle(token, article) {
     return handleResponse(response);
 }
 
-export async function updateArticle(token, id, article) {
+export async function updateArticle(token: string, id: number, article: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/articles/${id}`, {
         method: "PUT",
         headers: {
@@ -145,7 +146,7 @@ export async function updateArticle(token, id, article) {
     return handleResponse(response);
 }
 
-export async function deleteArticle(token, id) {
+export async function deleteArticle(token: string, id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/articles/${id}`, {
         method: "DELETE",
         headers: {
@@ -157,13 +158,13 @@ export async function deleteArticle(token, id) {
 
 // --- SubArticles ---
 
-export async function getSubArticles(article_id) {
+export async function getSubArticles(article_id?: number): Promise<any> {
     const url = article_id ? `${API_BASE_URL}/subarticles?article_id=${article_id}` : `${API_BASE_URL}/subarticles`;
     const response = await fetch(url);
     return handleResponse(response);
 }
 
-export async function createSubArticle(token, subarticle) {
+export async function createSubArticle(token: string, subarticle: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subarticles`, {
         method: "POST",
         headers: {
@@ -175,7 +176,7 @@ export async function createSubArticle(token, subarticle) {
     return handleResponse(response);
 }
 
-export async function updateSubArticle(token, id, subarticle) {
+export async function updateSubArticle(token: string, id: number, subarticle: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subarticles/${id}`, {
         method: "PUT",
         headers: {
@@ -187,7 +188,7 @@ export async function updateSubArticle(token, id, subarticle) {
     return handleResponse(response);
 }
 
-export async function deleteSubArticle(token, id) {
+export async function deleteSubArticle(token: string, id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/admin/subarticles/${id}`, {
         method: "DELETE",
         headers: {
@@ -199,7 +200,7 @@ export async function deleteSubArticle(token, id) {
 
 // --- Uploads ---
 
-export async function uploadImage(token, file) {
+export async function uploadImage(token: string, file: File): Promise<any> {
     const formData = new FormData();
     formData.append("image", file);
 

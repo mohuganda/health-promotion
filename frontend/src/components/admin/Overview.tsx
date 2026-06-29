@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
+    SERVER_BASE_URL,
     login, 
     getCategories, 
     createCategory, 
@@ -58,7 +59,7 @@ interface SubArticle {
 }
 
 const Overview = () => {
-    const [token, setToken] = useState<string | null>(localStorage.getItem('adminToken'));
+    const [token, setToken] = useState<string>(localStorage.getItem('adminToken') || '');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -95,7 +96,7 @@ const Overview = () => {
                     const quill = quillRef.current.getEditor();
                     const range = quill.getSelection();
                     const index = range ? range.index : quill.getLength();
-                    const html = `<img class="content-image-style" src="http://localhost:8421${data.image_url}" alt="${file.name}"/>`;
+                    const html = `<img class="content-image-style" src="${SERVER_BASE_URL}${data.image_url}" alt="${file.name}"/>`;
                     quill.clipboard.dangerouslyPasteHTML(index, html);
                 } catch (err: any) {
                     setError('Image upload failed: ' + err.message);
@@ -219,7 +220,7 @@ const Overview = () => {
     };
 
     const handleLogout = () => {
-        setToken(null);
+        setToken('');
         localStorage.removeItem('adminToken');
         resetAllState();
     };
@@ -380,8 +381,8 @@ const Overview = () => {
                     <h2>Admin Login</h2>
                     {error && <div className="error">{error}</div>}
                     <form className="form" onSubmit={handleLogin}>
-                        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <input type="text" placeholder="Username" value={username} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} required />
+                        <input type="password" placeholder="Password" value={password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} required />
                         <button type="submit">Login</button>
                     </form>
                 </div>
@@ -438,7 +439,7 @@ const Overview = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {categories.map((c) => (
+                            {categories.map((c: Category) => (
                                 <tr key={c.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                                     <td>
                                         <button className="link-button item-category" onClick={() => { setActiveCategory(c); fetchSubCategories(c.id); }}>{c.name}</button>
@@ -472,7 +473,7 @@ const Overview = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {subcategories.map((sc) => (
+                            {subcategories.map((sc: SubCategory) => (
                                 <tr key={sc.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                                     <td>
                                         <button className="link-button item-category" onClick={() => { setActiveSubCategory(sc); fetchArticles(sc.id); }}>{sc.name}</button>
@@ -508,7 +509,7 @@ const Overview = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {articles.map((a) => (
+                            {articles.map((a: Article) => (
                                 <tr key={a.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                                     <td>
                                         <button className="link-button item-category" onClick={() => { setActiveArticle(a); fetchSubArticles(a.id); }}>{a.title}</button>
@@ -543,7 +544,7 @@ const Overview = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {subarticles.map((sa) => (
+                            {subarticles.map((sa: SubArticle) => (
                                 <tr key={sa.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                                     <td style={{ padding: '0.75rem' }}>{sa.title}</td>
                                     <td style={{ padding: '0.75rem' }}>{sa.content.substring(0, 100)}...</td>
@@ -573,7 +574,7 @@ const Overview = () => {
                                 <>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Title</label>
-                                        <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} required />
+                                        <input type="text" value={formTitle} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormTitle(e.target.value)} required />
                                     </div>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Content</label>
@@ -594,11 +595,11 @@ const Overview = () => {
                                 <>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Name</label>
-                                        <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} required />
+                                        <input type="text" value={formName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormName(e.target.value)} required />
                                     </div>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Description</label>
-                                        <textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} rows={4} />
+                                        <textarea value={formDescription} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormDescription(e.target.value)} rows={4} />
                                     </div>
                                 </>
                             )}

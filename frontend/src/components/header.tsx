@@ -12,19 +12,19 @@ const HeaderComponent = () => {
                 <nav id="navmenu" className="navmenu">
                     <ul>
                         <li>
-                            <NavLink to="/" end className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/" end className={({ isActive }: { isActive: boolean }) => isActive ? "active" : ""}>
                                 Home
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/categories" className={({ isActive }) => isActive ? "active" : ""}>
+                            <NavLink to="/categories" className={({ isActive }: { isActive: boolean }) => isActive ? "active" : ""}>
                                 Disease Categories
                             </NavLink>
                         </li>
                         <li>
                             <NavLink
                                 to="/a-z"
-                                className={({ isActive }) => isActive ? "active" : ""}
+                                className={({ isActive }: { isActive: boolean }) => isActive ? "active" : ""}
                             >
                                 A-Z
                             </NavLink>
