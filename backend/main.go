@@ -317,51 +317,24 @@ func seedDiseases() {
 		return
 	}
 
-	// Seed Categories
-	var categoryID int
-	err = db.QueryRow(`
-		INSERT INTO disease_categories(name, description)
-		VALUES('Infectious Diseases', 'Diseases caused by pathogenic microorganisms')
-		RETURNING id
-	`).Scan(&categoryID)
+	log.Println("Database is empty. Seeding database with default HEXI categories and subcategories...")
+
+	// Read the seed.sql file
+	seedFilePath := "seed.sql"
+	content, err := os.ReadFile(seedFilePath)
 	if err != nil {
-		log.Println("Error seeding categories:", err)
+		log.Printf("Error reading seed file %s: %v\n", seedFilePath, err)
 		return
 	}
 
-	// Seed Subcategories
-	var subCategoryID int
-	err = db.QueryRow(`
-		INSERT INTO disease_subcategories(category_id, name, description)
-		VALUES($1, 'Viral Infections', 'Diseases caused by viruses')
-		RETURNING id
-	`, categoryID).Scan(&subCategoryID)
+	// Execute the SQL statements
+	_, err = db.Exec(string(content))
 	if err != nil {
-		log.Println("Error seeding subcategories:", err)
+		log.Println("Error executing seed SQL statements:", err)
 		return
 	}
 
-	// Seed Articles
-	var articleID int
-	err = db.QueryRow(`
-		INSERT INTO articles(subcategory_id, title, content)
-		VALUES($1, 'Ebola Virus Disease', 'Detailed article about Ebola')
-		RETURNING id
-	`, subCategoryID).Scan(&articleID)
-	if err != nil {
-		log.Println("Error seeding articles:", err)
-		return
-	}
-
-	// Seed SubArticles
-	_, err = db.Exec(`
-		INSERT INTO sub_articles(article_id, title, content)
-		VALUES($1, 'Symptoms', 'Fever, fatigue, muscle pain, headache...'),
-		($1, 'Prevention', 'Hand washing, avoiding contact with infected people...')
-	`, articleID)
-	if err != nil {
-		log.Println("Error seeding subarticles:", err)
-	}
+	log.Println("Database seeded successfully with default categories, subcategories, and articles!")
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
